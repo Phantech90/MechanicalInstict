@@ -1,15 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class heartCtrl : MonoBehaviour
 {
     private Vector3 StartingPos = Vector3.zero;
 
-    public float Speed;
-    public float Sensitivity;
     private Vector2 MovePos;
 
+    public float moveSpeed = 3f;
+    public Rigidbody2D rb;
+    Vector2 movement;
     public int MaxX = 2;
     public int MaxY = 2;
     public int MinX = -2;
@@ -26,18 +29,20 @@ public class heartCtrl : MonoBehaviour
         MovePos = StartingPos;
     }
 
+    void Update()
+    {
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
+
+        Vector3 pos = transform.position;
+        pos.x = Mathf.Clamp(pos.x, MinX, MaxX);
+        pos.y = Mathf.Clamp(pos.y, MinY, MaxY);
+        transform.position = pos;
+    }
+
     private void FixedUpdate()
     {
-        float horizontal = Input.GetAxis("Horizontal") * Sensitivity;
-        float vertical = Input.GetAxis("Vertical") * Sensitivity;
-
-        MovePos.x += horizontal;
-        MovePos.y += vertical;
-
-        MovePos.x = Mathf.Clamp(MovePos.x, MinX, MaxX);
-        MovePos.y = Mathf.Clamp(MovePos.y, MinY, MaxY);
-
-        transform.position = Vector2.Lerp(transform.position, MovePos, Speed * Time.deltaTime);
+        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
     }
 
 

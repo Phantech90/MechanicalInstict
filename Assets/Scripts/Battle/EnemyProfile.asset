@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8571f290c2a57a49933512e825448f3, type: 3}
   m_Name: EnemyProfile
   m_EditorClassIdentifier: 
-  Hp: 20
-  CharmHp: 10
-  EnemyVisual: {fileID: 0}
-  EnemiesAttacks: []
+  Hp: 1
+  CharmHp: 100
+  EnemyVisual: {fileID: 21300000, guid: fef350b0efd94db4cbee70ddd305780d, type: 3}
+  EnemiesAttacks:
+  - {fileID: 1922950528592696981, guid: 2d1369d3d9b7fd648ac9d7b2da2c12da, type: 3}

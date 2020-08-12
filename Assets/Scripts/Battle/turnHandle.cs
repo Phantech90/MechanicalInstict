@@ -2,11 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public enum BattleState
 {
     Start,
-    PlayerTurn,
     EnemyTurn,
     FinishedTurn,
     Won,
@@ -17,29 +17,45 @@ public class turnHandle : MonoBehaviour
     public BattleState state;
 
     public EnemyProfile[] EnemiesInBattle;
-    private bool enemyActed;
+    private bool enemyAttacked;
     private GameObject[] EnemyAtks;
 
-    public GameObject PlayerUi;
     public heartCtrl PlayerHeart;
+    public int NumOfAtks = 3;
+
+    public string winSceneName;
+    public string loseSceneName;
+    public void GoToWinScene()
+    {
+        SceneManager.LoadScene(winSceneName);
+    }
+    public void GoToLoseScene()
+    {
+        SceneManager.LoadScene(loseSceneName);
+    }
 
     private void Start()
     {
         state = BattleState.Start;
-        enemyActed = false;
+        enemyAttacked = false;
     }
 
     private void Update()
     {
+        if (PlayerHeart.GetComponent<playerHealth>().HP < 0)
+        {
+            state = BattleState.Lost;
+        }
+        if (state == BattleState.Lost)
+        {
+            GoToLoseScene();
+        }
+
         if (state == BattleState.Start)
-        {
-            PlayerUi.SetActive(true);
-            state = BattleState.PlayerTurn;
+        {           
+            state = BattleState.EnemyTurn;
         }
-        else if (state == BattleState.PlayerTurn)
-        {
-            //wait for player to attack
-        }
+
         else if (state == BattleState.EnemyTurn)
         {
             if (EnemiesInBattle.Length <= 0)
@@ -48,7 +64,7 @@ public class turnHandle : MonoBehaviour
             }
             else
             {
-                if (!enemyActed)
+                if (!enemyAttacked)
                 {
                     PlayerHeart.gameObject.SetActive(true);
                     PlayerHeart.SetHeart();
@@ -62,7 +78,7 @@ public class turnHandle : MonoBehaviour
 
                     EnemyAtks = GameObject.FindGameObjectsWithTag("Enemy");
 
-                    enemyActed = true;
+                    enemyAttacked = true;
                 }
                 else
                 {
@@ -84,11 +100,9 @@ public class turnHandle : MonoBehaviour
         }
         else if (state == BattleState.FinishedTurn)
         {
-            PlayerHeart.gameObject.SetActive(false);
-
-            if (PlayerHeart.GetComponent<playerHealth>().HP < 0)
+            if (NumOfAtks <= 0)
             {
-                state = BattleState.Lost;
+                state = BattleState.Won;
             }
             else
             {
@@ -97,20 +111,8 @@ public class turnHandle : MonoBehaviour
         }
         else if (state == BattleState.Won)
         {
-
+            GoToWinScene();
         }
-    }
-
-    public void PlayerAct()
-    {
-        playerfinishTurn();
-    }
-
-    void playerfinishTurn()
-    {
-        PlayerUi.SetActive(false);
-
-        state = BattleState.EnemyTurn;
     }
 
     void EnemyFinishedTurn()
@@ -119,8 +121,8 @@ public class turnHandle : MonoBehaviour
         {
             Destroy(obj);
         }
-
-        enemyActed = false;
-        state = BattleState.FinishedTurn;
+        NumOfAtks =- 1;
+        enemyAttacked = false;
+        state = BattleState.Start;
     }
 }
